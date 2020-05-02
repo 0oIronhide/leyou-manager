@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.util.List;
+
 /**
  * @author Ironhide
  * @create 2020-04-28-17:59
@@ -21,4 +23,7 @@ public interface BrandMapper extends Mapper<Brand> {
 
     @Select("select name from tb_brand where id = #{brandId}")
     String getBrandName(Long brandId);
+
+    @Select("select b.id,b.name from tb_brand b LEFT JOIN tb_category_brand cb on b.id = cb.brand_id where cb.category_id = #{cid}")
+    List<Brand> getBrandByCategoryId(Long cid);
 }

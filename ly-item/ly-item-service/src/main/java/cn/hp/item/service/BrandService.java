@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
+import javax.persistence.Id;
 import java.util.List;
 
 /**
@@ -53,5 +54,9 @@ public class BrandService {
             brandMapper.insertBrandCategory(cid, brand.getId());
         });
         return brandMapper.updateByPrimaryKeySelective(brand);
+    }
+
+    public List<Brand> getBrandByCategoryId(Long cid) {
+        return brandMapper.getBrandByCategoryId(cid);
     }
 }

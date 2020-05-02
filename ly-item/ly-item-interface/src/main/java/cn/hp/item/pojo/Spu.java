@@ -6,7 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Data
 @Table(name = "tb_spu")
@@ -32,7 +32,7 @@ public class Spu {
 
     private Boolean valid;
 
-    private Timestamp createTime;
+    private Date createTime;
 
-    private Timestamp lastUpdateTime;
+    private Date lastUpdateTime;
 }

@@ -53,4 +53,19 @@ public class BrandController {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
 
+    /**
+     * 通过类别id获取类别下的品牌
+     *
+     * @param cid
+     * @return
+     */
+    @GetMapping("cid/{cid}")
+    public ResponseEntity<List<Brand>> getBrandByCategoryId(@PathVariable("cid") Long cid) {
+        List<Brand> brands = service.getBrandByCategoryId(cid);
+        if (brands == null || brands.size() == 0) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(brands);
+    }
+
 }
