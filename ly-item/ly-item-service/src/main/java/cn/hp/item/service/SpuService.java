@@ -1,10 +1,7 @@
 package cn.hp.item.service;
 
 import cn.hp.item.mapper.*;
-import cn.hp.item.pojo.Sku;
-import cn.hp.item.pojo.Spu;
-import cn.hp.item.pojo.SpuBo;
-import cn.hp.item.pojo.Stock;
+import cn.hp.item.pojo.*;
 import cn.hp.utils.PageResult;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -70,31 +67,59 @@ public class SpuService {
     }
 
     @Transactional
-    public Integer addSpu(SpuBo spuBo) {
+    public Integer addOrUpdateSpu(SpuBo spuBo) {
         Spu spu = new Spu();
         BeanUtils.copyProperties(spuBo, spu);
+        Integer res = 0;
         Date date = new Date();
-        spu.setCreateTime(date);
         spu.setLastUpdateTime(date);
-        spu.setSaleable(true);
-        spu.setValid(true);
-        Integer res = spuMapper.insertSelective(spu);
+        if (spuBo.getId() == null) {
+            spu.setCreateTime(date);
+            spu.setSaleable(true);
+            spu.setValid(true);
+            res = spuMapper.insertSelective(spu);
+        } else {
+            res = spuMapper.updateByPrimaryKeySelective(spu);
+        }
 
-        spuBo.getSpuDetail().setSpuId(spu.getId());
-        spuDetailMapper.insertSelective(spuBo.getSpuDetail());
+        if (spuBo.getSpuDetail().getSpuId() == null) {
+            spuBo.getSpuDetail().setSpuId(spu.getId());
+            spuDetailMapper.insertSelective(spuBo.getSpuDetail());
+        } else {
+            spuDetailMapper.updateByPrimaryKeySelective(spuBo.getSpuDetail());
+        }
 
         List<Sku> skus = spuBo.getSkus();
         skus.forEach(sku -> {
-            sku.setSpuId(spu.getId());
-            sku.setCreateTime(date);
-            sku.setLastUpdateTime(date);
-            skuMapper.insertSelective(sku);
-
             Stock stock = new Stock();
-            stock.setSkuId(sku.getId());
-            stock.setStock(sku.getStock());
-            stockMapper.insertSelective(stock);
+            sku.setLastUpdateTime(date);
+            if (sku.getId() == null) {
+                sku.setSpuId(spu.getId());
+                sku.setCreateTime(date);
+                skuMapper.insertSelective(sku);
+
+                stock.setSkuId(sku.getId());
+                stock.setStock(sku.getStock());
+                stockMapper.insertSelective(stock);
+            } else {
+                skuMapper.updateByPrimaryKeySelective(sku);
+
+                stock.setSkuId(sku.getId());
+                stock.setStock(sku.getStock());
+                stockMapper.updateByPrimaryKeySelective(stock);
+            }
         });
         return res;
     }
+
+    public SpuDetail getSpuDetail(Long spuId) {
+        return spuDetailMapper.selectByPrimaryKey(spuId);
+    }
+
+    public List<Sku> getSpuSkus(Long spuId) {
+        Sku sku = new Sku();
+        sku.setSpuId(spuId);
+        return skuMapper.select(sku);
+    }
+
 }

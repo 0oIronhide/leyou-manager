@@ -1,7 +1,9 @@
 package cn.hp.item.controller;
 
+import cn.hp.item.pojo.Sku;
 import cn.hp.item.pojo.Spu;
 import cn.hp.item.pojo.SpuBo;
+import cn.hp.item.pojo.SpuDetail;
 import cn.hp.item.service.SpuService;
 import cn.hp.utils.PageResult;
 import org.springframework.beans.BeanUtils;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.beans.Beans;
+import java.util.List;
 
 /**
  * @author Ironhide
@@ -44,15 +47,53 @@ public class SpuController {
      */
     @PostMapping("goods")
     public ResponseEntity<Void> addSpu(@RequestBody SpuBo spuBo) {
-        if (service.addSpu(spuBo) > 0) {
+        if (service.addOrUpdateSpu(spuBo) > 0) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
 
+    /**
+     * 查询商品detail信息
+     *
+     * @param spuId
+     * @return
+     */
     @GetMapping("spu/detail/{spuId}")
-    public ResponseEntity<SpuBo> getSpuDetail(){
+    public ResponseEntity<SpuDetail> getSpuDetail(@PathVariable("spuId") Long spuId) {
+        SpuDetail spuDetail = service.getSpuDetail(spuId);
+        if (spuDetail == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(spuDetail);
+    }
 
+    /**
+     * 查询商品的sku信息
+     *
+     * @param spuId
+     * @return
+     */
+    @GetMapping("sku/list")
+    public ResponseEntity<List<Sku>> getSpuSkus(@RequestParam("id") Long spuId) {
+        List<Sku> skus = service.getSpuSkus(spuId);
+        if (skus == null || skus.size() == 0) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(skus);
+    }
+
+    /**
+     * 修改商品信息
+     *
+     * @param spuBo
+     * @return
+     */
+    @PutMapping("goods")
+    public ResponseEntity<Void> updateSpu(@RequestBody SpuBo spuBo) {
+        if (service.addOrUpdateSpu(spuBo) > 0) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        }
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
 
