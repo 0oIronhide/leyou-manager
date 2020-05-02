@@ -59,4 +59,8 @@ public class BrandService {
     public List<Brand> getBrandByCategoryId(Long cid) {
         return brandMapper.getBrandByCategoryId(cid);
     }
+
+    public Brand getOneBrandById(Long bid) {
+        return brandMapper.selectByPrimaryKey(bid);
+    }
 }

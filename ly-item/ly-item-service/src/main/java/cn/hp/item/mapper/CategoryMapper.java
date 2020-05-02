@@ -16,6 +16,6 @@ public interface CategoryMapper extends Mapper<Category> {
     @Select("select c.* from tb_category c LEFT JOIN tb_category_brand cb on c.id = cb.category_id where cb.brand_id = #{id}")
     List<Category> getBrandCategory(Long id);
 
-    @Select("select name from tb_category where id in ${cids}")
-    List<String> getCategotyName(@Param("cids") String cids);
+    @Select("select name from tb_category where id = #{cid}")
+    String getCategotyName(Long cid);
 }

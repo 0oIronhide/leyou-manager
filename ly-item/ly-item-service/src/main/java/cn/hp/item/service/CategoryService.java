@@ -5,6 +5,7 @@ import cn.hp.item.pojo.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,5 +26,13 @@ public class CategoryService {
 
     public List<Category> getBrandCategory(Long id) {
         return mapper.getBrandCategory(id);
+    }
+
+    public List<String> queryCategoryNamesByIds(List<Long> ids) {
+        List<String> names = new ArrayList<>();
+        ids.forEach(id -> {
+            names.add(mapper.getCategotyName(id));
+        });
+        return names;
     }
 }

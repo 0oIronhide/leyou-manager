@@ -57,8 +57,11 @@ public class SpuService {
         spuList.forEach(spu -> {
             SpuBo spuBo = new SpuBo();
             BeanUtils.copyProperties(spu, spuBo);
-            String cids = "(" + spuBo.getCid1() + "," + spuBo.getCid2() + "," + spuBo.getCid3() + ")";
-            List<String> names = categoryMapper.getCategotyName(cids);
+            Long[] cids = new Long[]{spuBo.getCid1(), spuBo.getCid2(), spuBo.getCid3()};
+            List<String> names = new ArrayList<>();
+            for (Long cid : cids) {
+                names.add(categoryMapper.getCategotyName(cid));
+            }
             spuBo.setCname(StringUtils.join(names, "/"));
             spuBo.setBname(brandMapper.getBrandName(spuBo.getBrandId()));
             spuBoList.add(spuBo);

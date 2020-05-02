@@ -6,6 +6,7 @@ import cn.hp.item.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,5 +39,21 @@ public class CategoryController {
         }
         return ResponseEntity.ok(categories);
     }
+
+    /**
+     * 根据商品分类 id，查询商品分类名称
+     *
+     * @param ids
+     * @return
+     */
+    @GetMapping("/names")
+    public ResponseEntity<List<String>> queryCategoryNamesByIds(@RequestParam("ids") List<Long> ids) {
+        List<String> names = service.queryCategoryNamesByIds(ids);
+        if (CollectionUtils.isEmpty(names)) {
+            return ResponseEntity.notFound().build(); // 响应 404
+        }
+        return ResponseEntity.ok(names);
+    }
+
 
 }
