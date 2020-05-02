@@ -2,10 +2,7 @@ package cn.hp.item.pojo;
 
 import lombok.Data;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -33,5 +30,8 @@ public class Sku {
     private Date createTime;
 
     private Date lastUpdateTime;
+
+    @Transient
+    private Integer stock;// 库存
 
 }

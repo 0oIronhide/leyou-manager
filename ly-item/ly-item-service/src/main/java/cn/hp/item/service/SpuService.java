@@ -4,6 +4,7 @@ import cn.hp.item.mapper.*;
 import cn.hp.item.pojo.Sku;
 import cn.hp.item.pojo.Spu;
 import cn.hp.item.pojo.SpuBo;
+import cn.hp.item.pojo.Stock;
 import cn.hp.utils.PageResult;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -39,6 +40,9 @@ public class SpuService {
 
     @Autowired
     private SkuMapper skuMapper;
+
+    @Autowired
+    private StockMapper stockMapper;
 
     public PageResult<SpuBo> page(Integer page, Integer rows, Boolean saleable, String key) {
         PageHelper.startPage(page, rows);
@@ -85,6 +89,11 @@ public class SpuService {
             sku.setCreateTime(date);
             sku.setLastUpdateTime(date);
             skuMapper.insertSelective(sku);
+
+            Stock stock = new Stock();
+            stock.setSkuId(sku.getId());
+            stock.setStock(sku.getStock());
+            stockMapper.insertSelective(stock);
         });
         return res;
     }

@@ -50,4 +50,10 @@ public class SpuController {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
 
+    @GetMapping("spu/detail/{spuId}")
+    public ResponseEntity<SpuBo> getSpuDetail(){
+
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+    }
+
 }
