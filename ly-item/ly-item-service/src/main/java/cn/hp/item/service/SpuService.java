@@ -122,7 +122,14 @@ public class SpuService {
     public List<Sku> getSpuSkus(Long spuId) {
         Sku sku = new Sku();
         sku.setSpuId(spuId);
-        return skuMapper.select(sku);
+        List<Sku> skus = skuMapper.select(sku);
+        skus.forEach(skuTemp -> {
+            Stock stock = stockMapper.selectByPrimaryKey(skuTemp.getId());
+            if (stock != null) {
+                skuTemp.setStock(stock.getStock());
+            }
+        });
+        return skus;
     }
 
 }

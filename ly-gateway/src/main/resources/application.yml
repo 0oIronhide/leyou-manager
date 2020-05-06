@@ -19,6 +19,8 @@ zuul:
   retryable: true
   routes:
     item-service: /item/** #商品微服务
+    user-service: /user/**
+    #trade  authority
 
 
 ribbon:
