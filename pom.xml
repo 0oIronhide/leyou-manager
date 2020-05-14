@@ -17,6 +17,9 @@
         <module>ly-upload</module>
         <module>ly-search</module>
         <module>ly-user</module>
+        <module>ly-goods-page</module>
+        <module>ly-user</module>
+        <module>ly-sms-service</module>
     </modules>
 
     <parent>

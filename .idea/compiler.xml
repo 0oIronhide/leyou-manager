@@ -9,28 +9,35 @@
         <outputRelativeToContentRoot value="true" />
         <module name="ly-user-service" />
         <module name="ly-upload" />
-        <module name="ly-item-service" />
+        <module name="ly-common" />
+        <module name="ly-search" />
         <module name="ly-gateway" />
         <module name="ly-item-interface" />
-        <module name="ly-search" />
+        <module name="ly-sms-service" />
+        <module name="ly-goods-page" />
         <module name="ly-user-interface" />
-        <module name="ly-common" />
+        <module name="ly-item-service" />
         <module name="ly-registry" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ly-user" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="leyou" options="-parameters" />
       <module name="ly-common" options="-parameters" />
       <module name="ly-gateway" options="-parameters" />
+      <module name="ly-goods-page" options="-parameters" />
       <module name="ly-item" options="-parameters" />
       <module name="ly-item-interface" options="-parameters" />
       <module name="ly-item-service" options="-parameters" />
       <module name="ly-registry" options="-parameters" />
       <module name="ly-search" options="-parameters" />
+      <module name="ly-sms-service" options="-parameters" />
       <module name="ly-upload" options="-parameters" />
-      <module name="ly-user" options="-parameters" />
+      <module name="ly-user" options="" />
       <module name="ly-user-interface" options="-parameters" />
       <module name="ly-user-service" options="-parameters" />
     </option>

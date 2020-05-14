@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,5 +35,12 @@ public class CategoryService {
             names.add(mapper.getCategotyName(id));
         });
         return names;
+    }
+
+    public List<Category> queryAllByCid3(Long id) {
+        Category c3 = this.mapper.selectByPrimaryKey(id);
+        Category c2 = this.mapper.selectByPrimaryKey(c3.getParentId());
+        Category c1 = this.mapper.selectByPrimaryKey(c2.getParentId());
+        return Arrays.asList(c1,c2,c3);
     }
 }

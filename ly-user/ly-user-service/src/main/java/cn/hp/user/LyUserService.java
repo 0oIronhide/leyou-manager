@@ -1,17 +1,19 @@
-package cn.hp.service;
+package cn.hp.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import tk.mybatis.spring.annotation.MapperScan;
 
 /**
  * @author Ironhide
- * @create 2020-05-06-10:02
+ * @create 2020-05-14-15:27
  */
-@EnableDiscoveryClient
 @SpringBootApplication
-public class UserServiceApplication {
+@EnableDiscoveryClient
+@MapperScan("cn.hp.user.mapper")
+public class LyUserService {
     public static void main(String[] args) {
-        SpringApplication.run(UserServiceApplication.class, args);
+        SpringApplication.run(LyUserService.class, args);
     }
 }

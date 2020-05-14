@@ -20,7 +20,7 @@ zuul:
   routes:
     item-service: /item/** #商品微服务
     search-service: /search/** #搜索微服务
-    #user-service: /user/**
+    user-service: /user/**
     #trade  authority
 
 

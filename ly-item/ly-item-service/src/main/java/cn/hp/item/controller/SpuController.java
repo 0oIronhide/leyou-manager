@@ -1,6 +1,7 @@
 package cn.hp.item.controller;
 
 import cn.hp.item.pojo.Sku;
+import cn.hp.item.pojo.Spu;
 import cn.hp.item.pojo.SpuBo;
 import cn.hp.item.pojo.SpuDetail;
 import cn.hp.item.service.SpuService;
@@ -92,6 +93,11 @@ public class SpuController {
             return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         }
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+    }
+
+    @GetMapping("spu/{id}")
+    public Spu querySpuById(@PathVariable("id") Long spuId) {
+        return service.querySpuById(spuId);
     }
 
 }

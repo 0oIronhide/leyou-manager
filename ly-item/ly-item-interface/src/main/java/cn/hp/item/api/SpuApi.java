@@ -1,6 +1,7 @@
 package cn.hp.item.api;
 
 import cn.hp.item.pojo.Sku;
+import cn.hp.item.pojo.Spu;
 import cn.hp.item.pojo.SpuBo;
 import cn.hp.item.pojo.SpuDetail;
 import cn.hp.utils.PageResult;
@@ -45,5 +46,8 @@ public interface SpuApi {
      */
     @GetMapping("sku/list")
     public List<Sku> querySkusBySpuId(@RequestParam("id") Long spuId);
+
+    @GetMapping("spu/{id}")
+    public Spu querySpuById(@PathVariable("id") Long spuId);
 }
 

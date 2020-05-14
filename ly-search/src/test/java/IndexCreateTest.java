@@ -1,7 +1,6 @@
 import cn.hp.item.pojo.SpuBo;
 import cn.hp.search.SearchApplication;
 import cn.hp.search.client.SpuClient;
-import cn.hp.search.pojo.Goods;
 import cn.hp.search.repository.GoodsRepository;
 import cn.hp.search.service.IndexService;
 import cn.hp.utils.PageResult;
@@ -40,10 +39,10 @@ public class IndexCreateTest {
             page++;
             //从查询结果中获取到所有的spuBo信息
             List<SpuBo> spuBos = spuBoPageResult.getItems();
-            List<Goods> goodsList = new ArrayList<>();
+            List<com.leyou.search.pojo.Goods> goodsList = new ArrayList<>();
             spuBos.forEach(spuBo -> {
                 //把spuBo转换为goods
-                Goods goods = indexService.buildGoods(spuBo);
+                com.leyou.search.pojo.Goods goods = indexService.buildGoods(spuBo);
                 goodsList.add(goods);
             });
             //批量保存goods到索引库

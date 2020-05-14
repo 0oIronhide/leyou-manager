@@ -1,17 +1,15 @@
 package cn.hp.search.service;
 
-import cn.hp.item.pojo.Sku;
-import cn.hp.item.pojo.SpecParam;
-import cn.hp.item.pojo.SpuBo;
-import cn.hp.item.pojo.SpuDetail;
+import cn.hp.item.pojo.*;
 import cn.hp.search.client.CategoryClient;
 import cn.hp.search.client.SpecificationClient;
 import cn.hp.search.client.SpuClient;
-import cn.hp.search.pojo.Goods;
+import cn.hp.search.repository.GoodsRepository;
 import cn.hp.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import com.leyou.search.pojo.Goods;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,107 +21,108 @@ public class IndexService {
 
     @Autowired
     private CategoryClient categoryClient;
-
     @Autowired
-    private SpuClient spuClient;
-
+    private SpuClient goodsClient;
     @Autowired
     private SpecificationClient specClient;
+    @Autowired
+    private GoodsRepository goodsRepository;
 
-    //把spuBo转为goods的方法
+
     public Goods buildGoods(SpuBo spuBo) {
+        //SpuBo-Goods
         Goods goods = new Goods();
-
-        //对应拷贝赋值相同的属性
+        //复制
         BeanUtils.copyProperties(spuBo, goods);
-        //all 所有需要被搜索的信息，包含标题，分类
 
+
+        //根据spu的分类id 查询分类名称
         List<String> names = categoryClient.queryNamesByIds(Arrays.asList(spuBo.getCid1(), spuBo.getCid2(), spuBo.getCid3()));
-
-        //跨服务查询分类信息，并展示
+        //拼接all包含标题，分类
         String all = spuBo.getTitle() + " " + StringUtils.join(names, " ");
+        //华为 G9 Plus 32GB 手机 手机通讯 手机
         goods.setAll(all);
-        //price
-        //skus
 
-        //要处理sku首先要查询到所有的sku,由于sku只需要id，title，price，image，所以这里不能把整个sku纳入
-        List<Sku> skus = this.spuClient.querySkusBySpuId(spuBo.getId());
+        //根据spu的id查询sku
+        List<Sku> skus = goodsClient.querySkusBySpuId(spuBo.getId());
 
-        List<Map<String, Object>> skuMapList = new ArrayList<>();
-
+        List<Map<String, Object>> list = new ArrayList<>();
         List<Long> prices = new ArrayList<>();
 
-        skus.forEach(sku -> {
+        for (Sku sku : skus) {
+
+            //把sku的价格放入list
             prices.add(sku.getPrice());
-            Map<String, Object> skuMap = new HashMap<>();
-            skuMap.put("id", sku.getId());
-            skuMap.put("title", sku.getTitle());
-            skuMap.put("price", sku.getPrice());
-            //如果不为空，多个图片是以逗号分隔，所以切开取第一个
-            skuMap.put("image", StringUtils.isBlank(sku.getImages()) ? "" : sku.getImages().split(",")[0]);
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", sku.getId());
+            map.put("title", sku.getTitle());
+            map.put("price", sku.getPrice());
+            map.put("image", StringUtils.isBlank(sku.getImages()) ? "" : sku.getImages().split(",")[0]);
+            list.add(map);
+        }
 
-            skuMapList.add(skuMap);
-        });
-        goods.setSkus(JsonUtils.serialize(skuMapList));
-
+        //list变成json字符串
+        goods.setSkus(JsonUtils.serialize(list));
         goods.setPrice(prices);
-
         //specs
-        Map<String, Object> specs = getSpecs(spuBo);
-        //把最终获取到的spec数据赋值给goods
-        goods.setSpecs(specs);
-
+        Map<String, Object> specsMap = getSpecs(spuBo);
+        goods.setSpecs(specsMap);
         return goods;
     }
 
-    //规格参数
+    //根据spu查询规格参数
     private Map<String, Object> getSpecs(SpuBo spuBo) {
+        Map<String, Object> specs = new HashMap<String, Object>();
 
-        //key规格参数的名称，值为对应的规格参数的值（取决于商品本身）
-        Map<String, Object> specs = new HashMap<>();//操作系统：android
+        //查询spudetial
+        SpuDetail spuDetail = this.goodsClient.querySpuDetailBySpuId(spuBo.getId());
 
-        //1,获取到所有的可搜索的规格参数
-        List<SpecParam> searchingParams = this.specClient.querySpecParams(null, spuBo.getCid3(), true, null);
+        //查询规格参数
+        List<SpecParam> specParams = specClient.querySpecParams(null, spuBo.getCid3(), true, null);
 
-        //2,循环可搜索的规格参数集合，判断通用还是特有，通用从通用规格中取值，特有从特有规格中取值
-
-        SpuDetail spuDetail = this.spuClient.querySpuDetailBySpuId(spuBo.getId());
-
-        //由于要取值，为了方便我们把通用规格和特有规格都转换为Map
-        //通用规格键值对集合map
+        //{"1":"1其它","2":"1G9青春版（全网通版）","3":"12016","5":"1143","6":"1其它","7":"Android","8":"骁龙（Snapdragon)","9":"骁龙617（msm8952）","10":"八核","11":1.5,"14":5.2,"15":"1920*1080(FHD)","16":800,"17":1300,"18":3000}
+        //把通用的规格参数变成map结构
         Map<Long, Object> genericMap = JsonUtils.nativeRead(spuDetail.getGenericSpec(), new TypeReference<Map<Long, Object>>() {
         });
-        //特有规格键值对集合map
+
+        //{"4":["1白色","1金色"],"12":["3GB"],"13":["16GB"]}
+        //把特有的规格参数变成map结构
         Map<Long, List<String>> specialMap = JsonUtils.nativeRead(spuDetail.getSpecialSpec(), new TypeReference<Map<Long, List<String>>>() {
         });
+        //7	76	3	操作系统	0		1	1
+        //8	76	4	CPU品牌	0		1	1
 
-        //3,通用和特有的值来自于spuDetail
-        searchingParams.forEach(specParam -> {
-            Long id = specParam.getId();//对应取值，规格参数的id就是通用规格和特有规格保存时map的key，当key一致可以直接取值
-            String name = specParam.getName();//具体的key的值
-
-            //通用参数
+        for (SpecParam specParam : specParams) {
+            Long id = specParam.getId();//10
+            String name = specParam.getName();//CPU核数
             Object value = null;
+            //通用规格参数
             if (specParam.getGeneric()) {
-                //通用参数
-                value = genericMap.get(id);
-
+                value = genericMap.get(id);//"八核"
+                //如果是数值类型，分断
                 if (null != value && specParam.getNumeric()) {
-                    //数值类型可能需要加分段,以及单位
+                    //把数字变成分段
                     value = this.chooseSegment(value.toString(), specParam);
+
                 }
-            } else {//特有参数
+
+                //特有规格参数
+            } else {
                 value = specialMap.get(id);
 
             }
             if (null == value) {
                 value = "其他";
             }
-            specs.put(name, value);
-        });
+            specs.put(name, value);//CPU核数 八核
+
+
+        }
         return specs;
 
+
     }
+
 
     private String chooseSegment(String value, SpecParam p) {
         double val = NumberUtils.toDouble(value);
@@ -152,4 +151,15 @@ public class IndexService {
         return result;
     }
 
+    public void createIndex(Long id) {
+        Spu spu = this.goodsClient.querySpuById(id);
+        SpuBo spuBo = new SpuBo();
+        BeanUtils.copyProperties(spu, spuBo);
+        Goods goods = this.buildGoods(spuBo);
+        this.goodsRepository.save(goods);
+    }
+
+    public void deleteIndex(Long id) {
+        this.goodsRepository.deleteById(id);
+    }
 }

@@ -6,6 +6,7 @@ import cn.hp.utils.PageResult;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,21 +26,18 @@ public class SpuService {
 
     @Autowired
     private SpuMapper spuMapper;
-
     @Autowired
     private CategoryMapper categoryMapper;
-
     @Autowired
     private BrandMapper brandMapper;
-
     @Autowired
     private SpuDetailMapper spuDetailMapper;
-
     @Autowired
     private SkuMapper skuMapper;
-
     @Autowired
     private StockMapper stockMapper;
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     public PageResult<SpuBo> page(Integer page, Integer rows, Boolean saleable, String key) {
         PageHelper.startPage(page, rows);
@@ -132,4 +130,22 @@ public class SpuService {
         return skus;
     }
 
+    public Spu querySpuById(Long spuId) {
+        return spuMapper.selectByPrimaryKey(spuId);
+    }
+
+    /**
+     * 发送消息的方法，id就是spuId，type就是操作类型（增删改查）
+     *
+     * @param id
+     * @param type
+     */
+    private void sendMessage(Long id, String type) {
+        try {
+            this.amqpTemplate.convertAndSend("item." + type, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //logge.error("{}商品消息发送异常，商品id：{}", type, id, e);
+        }
+    }
 }
